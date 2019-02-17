@@ -639,6 +639,16 @@ pure RV32I target, and install it in `/opt/riscv32i`:
     ../configure --with-arch=rv32i --prefix=/opt/riscv32i
     make -j$(nproc)
 
+To build the toolchain for the RV32E target, use these commands instead (from the 
+build directory assuming you have checked out git rev c3ad555):
+
+    sudo mkdir /opt/riscv32e
+    sudo chown $USER /opt/riscv32e
+    
+    make clean
+    ../configure --with-arch=rv32e --with-abi=ilp32e --prefix=/opt/riscv32e
+    make -j$(nproc)
+    
 The commands will all be named using the prefix `riscv32-unknown-elf-`, which
 makes it easy to install them side-by-side with the regular riscv-tools (those
 are using the name prefix `riscv64-unknown-elf-` by default).

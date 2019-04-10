@@ -132,15 +132,16 @@ endmodule
 // Replace the following two modules with wrappers for your SRAM cells.
 
 module dp_regs #(
-	parameter [0:0] ENABLE_REGS_16_31 = 1
+	parameter [0:0] ENABLE_REGS_16_31 = 1, 
+	parameter [0:0] ENABLE_IRQ_QREGS = 1
 ) (
 	input clk, wen,
-	input [(ENABLE_REGS_16_31 ? 4 : 3):0] waddr,
-	input [(ENABLE_REGS_16_31 ? 4 : 3):0] raddr,
+	input [(3 + ENABLE_REGS_16_31 + ENABLE_IRQ_QREGS):0] waddr,
+	input [(3 + ENABLE_REGS_16_31 + ENABLE_IRQ_QREGS):0] raddr,
 	input [31:0] wdata,
 	output [31:0] rdata
 );
-	reg [31:0] regs [0:(ENABLE_REGS_16_31 ? 31 : 15)];
+	reg [31:0] regs [0:((2**(4 + ENABLE_REGS_16_31 + ENABLE_IRQ_QREGS))-1)];
 
 	initial begin
 		$readmemh ("reg_init.memh", regs);

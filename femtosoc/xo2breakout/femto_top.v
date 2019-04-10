@@ -3,7 +3,7 @@ module femtosoc_top(
 	output wire [7:0] led
 );
 
-parameter integer MEM_WORDS = 1024;
+parameter integer MEM_WORDS = 4096;
 
 wire clk;
 

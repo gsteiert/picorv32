@@ -54,6 +54,7 @@ module femtosoc (
 	parameter [0:0] ENABLE_COUNTERS = 0;
 	parameter [0:0] ENABLE_COUNTERS64 = 0;
 	parameter [0:0] ENABLE_IRQ_QREGS = 0;
+	parameter [0:0] ENABLE_IRQ_TIMER = 0;
 	parameter [0:0] ENABLE_REGS_16_31 = 1;
 	parameter [0:0] ENABLE_REGS_DUALPORT = 0;
 
@@ -143,9 +144,9 @@ module dp_regs #(
 );
 	reg [31:0] regs [0:((2**(4 + ENABLE_REGS_16_31 + ENABLE_IRQ_QREGS))-1)];
 
-	initial begin
-		$readmemh ("reg_init.memh", regs);
-	end
+	// initial begin
+	// 	$readmemh ("reg_init.memh", regs);
+	// end
 
 	always @(posedge clk)
 		if (wen) regs[waddr] <= wdata;

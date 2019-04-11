@@ -1,5 +1,8 @@
 module femtosoc_top(
-	inout wire sda, scl,
+	input wire timer_in,
+	inout wire sda, scl, msda, mscl, spi_clk, spi_mosi, spi_miso,
+	output wire timer_out,
+	output wire [7:0] spi_csn,
 	output wire [7:0] led
 );
 
@@ -8,6 +11,11 @@ parameter integer MEM_WORDS = 4096;
 wire clk;
 
 wire iomem_valid;
+reg wb_stb;
+wire wb_ack;
+wire [7:0] wb_rdata;
+reg led_strobe;
+reg [7:0] led_reg = 8'hA5;
 reg iomem_ready = 0;
 wire [3:0] iomem_wstrb;
 wire [31:0] iomem_addr;
@@ -21,20 +29,46 @@ always @(posedge clk) begin
 	reset_cnt <= reset_cnt + !resetn;
 end
 
-assign led = ~iomem_rdata[7:0];
+assign led = ~led_reg[7:0];
 
 always @(posedge clk) begin
-	if (iomem_valid) begin
-		iomem_ready <= 1'b1;
-		if (iomem_wstrb[3]) iomem_rdata[31:24] <= iomem_wdata[31:24];
-		if (iomem_wstrb[2]) iomem_rdata[23:16] <= iomem_wdata[23:16];
-		if (iomem_wstrb[1]) iomem_rdata[15:8] <= iomem_wdata[15:8];
-		if (iomem_wstrb[0]) iomem_rdata[7:0] <= iomem_wdata[7:0];
+	if (iomem_valid && (iomem_addr[31:24] == 8'h01)) begin
+		led_strobe <= 1'b1;
 	end else begin
-		iomem_ready <= 1'b0;
+		led_strobe <= 1'b0;
 	end
 end
 
+always @(posedge clk) begin
+	if (iomem_valid && (iomem_addr[31:24] == 8'h04)) begin
+		wb_stb <= 1'b1;
+	end else begin
+		wb_stb <= 1'b0;
+	end
+end
+	
+always @(posedge clk) begin
+	if (iomem_valid) begin
+		case (iomem_addr[31:24])
+			8'h01: begin
+				iomem_ready <= 1'b1;
+				if (iomem_wstrb[0]) led_reg <= iomem_wdata[7:0];
+				iomem_rdata <= {24'h0, led_reg};
+			end
+			8'h04: begin
+				iomem_ready <= wb_ack;
+				iomem_rdata <= {24'h0, wb_rdata};
+			end
+			default: begin
+				iomem_ready <= 1'b1;
+				iomem_rdata <= 32'h00BADADD;
+			end
+		endcase 
+	end else begin
+		iomem_ready <= 1'b0;
+		iomem_rdata <= 32'hDEADBEEF;
+	end
+end
 
 
 // Internal Oscillator
@@ -46,7 +80,8 @@ OSCH OSCH_inst( .STDBY(1'b0), // 0=Enabled, 1=Disabled
 
 
 	femtosoc #(
-		.MEM_WORDS(MEM_WORDS)
+		.MEM_WORDS(MEM_WORDS),
+		.ENABLE_COMPRESSED(1'b1)
 	) soc (
 		.clk          (clk         ),
 		.resetn       (resetn      ),
@@ -59,6 +94,35 @@ OSCH OSCH_inst( .STDBY(1'b0), // 0=Enabled, 1=Disabled
 		.iomem_rdata  (iomem_rdata )
 	);
 
-efb efb0 (.wb_clk_i( clk ), .i2c1_scl( scl ), .i2c1_sda( sda ), .i2c1_irqo( ));
+efb efb0 (
+	.wb_clk_i( clk ), 
+	.wb_rst_i( !resetn ), 
+	.wb_cyc_i( wb_stb ), 
+	.wb_stb_i( wb_stb ), 
+	.wb_we_i( iomem_wstrb[0] ), 
+	.wb_adr_i( iomem_addr[7:0] ), 
+	.wb_dat_i( iomem_wdata[7:0] ), 
+	.wb_dat_o( wr_rdata ), 
+	.wb_ack_o( wr_ack ), 
+	.i2c1_scl( scl ), 
+	.i2c1_sda( sda ), 
+	.i2c1_irqo( ), 
+	.i2c2_scl( mscl ), 
+	.i2c2_sda( msda ), 
+	.i2c2_irqo( ), 
+	.spi_clk( spi_clk ), 
+	.spi_miso( spi_miso ), 
+	.spi_mosi( spi_mosi ), 
+	.spi_scsn( 1'b1 ), 
+	.spi_csn( spi_csn ), 
+	.spi_irq( ), 
+	.tc_clki( clk ), 
+	.tc_rstn( resetn ), 
+	.tc_ic( timer_in ), 
+	.tc_int( ), 
+	.tc_oc( timer_out ), 
+	.ufm_sn( 1'b1 ), 
+	.wbc_ufm_irq( ) 
+	);
 
 endmodule

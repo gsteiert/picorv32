@@ -9,9 +9,9 @@ counter: counter.S
 	python3 ../../firmware/makehex.py counter.bin 1024 > counter.mem
 
 femto_fw: main.c femto.lds femto.S
-	$(TOOLCHAIN_PREFIX)gcc -march=rv32i -Wl,-Bstatic,-T,femto.lds,--strip-debug -ffreestanding -nostdlib -o femto_fw.elf femto.S main.c
+	$(TOOLCHAIN_PREFIX)gcc -march=rv32ic -Wl,-Bstatic,-T,femto.lds,--strip-debug -ffreestanding -nostdlib -o femto_fw.elf femto.S main.c
 	$(TOOLCHAIN_PREFIX)objcopy -O binary femto_fw.elf femto_fw.bin
-	python3 ../../firmware/makehex.py femto_fw.bin 4096 > femto_fw.mem
+	python3 ../../firmware/makehex.py femto_fw.bin 16384 > femto_fw.mem
 
 .PHONY: clean
 clean:

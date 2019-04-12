@@ -32,15 +32,7 @@ end
 assign led = ~led_reg[7:0];
 
 always @(posedge clk) begin
-	if (iomem_valid && (iomem_addr[31:24] == 8'h01)) begin
-		led_strobe <= 1'b1;
-	end else begin
-		led_strobe <= 1'b0;
-	end
-end
-
-always @(posedge clk) begin
-	if (iomem_valid && (iomem_addr[31:24] == 8'h04)) begin
+	if (iomem_valid && (iomem_addr[31:24] == 8'h04) && !wb_ack && !iomem_ready) begin
 		wb_stb <= 1'b1;
 	end else begin
 		wb_stb <= 1'b0;
@@ -100,10 +92,10 @@ efb efb0 (
 	.wb_cyc_i( wb_stb ), 
 	.wb_stb_i( wb_stb ), 
 	.wb_we_i( iomem_wstrb[0] ), 
-	.wb_adr_i( iomem_addr[7:0] ), 
+	.wb_adr_i( iomem_addr[9:2] ), 
 	.wb_dat_i( iomem_wdata[7:0] ), 
-	.wb_dat_o( wr_rdata ), 
-	.wb_ack_o( wr_ack ), 
+	.wb_dat_o( wb_rdata ), 
+	.wb_ack_o( wb_ack ), 
 	.i2c1_scl( scl ), 
 	.i2c1_sda( sda ), 
 	.i2c1_irqo( ), 

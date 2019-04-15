@@ -59,6 +59,7 @@ module femtosoc (
 	parameter [0:0] ENABLE_REGS_DUALPORT = 0;
 
 	parameter integer MEM_WORDS = 1024;  // 32bit words
+	parameter MEM_FILE = "../../firmware/femto_fw.mem"; // default file location
 	parameter [31:0] CODE_START = 32'h 0000_0000;  // must be on word boundary
 	parameter [31:0] STACKADDR = (4 * MEM_WORDS);  // end of memory
 	parameter [31:0] PROGADDR_RESET = CODE_START;  // start of code
@@ -119,7 +120,8 @@ module femtosoc (
 		ram_ready <= mem_valid && !mem_ready && mem_addr < 4*MEM_WORDS;
 
 	`FEMTOSOC_MEM #(
-		.WORDS(MEM_WORDS)
+		.WORDS(MEM_WORDS),
+		.FILE(MEM_FILE)
 	) memory (
 		.clk(clk),
 		.wen((mem_valid && !mem_ready && mem_addr < 4*MEM_WORDS) ? mem_wstrb : 4'b0),
@@ -207,7 +209,8 @@ endgenerate
 endmodule
 
 module femtosoc_mem #(
-	parameter integer WORDS = 1024
+	parameter integer WORDS = 1024,
+	parameter FILE = "firmware.mem"
 ) (
 	input clk,
 	input [3:0] wen,
@@ -218,7 +221,7 @@ module femtosoc_mem #(
 	reg [31:0] mem [0:WORDS-1];
 
 	initial begin
-		$readmemh ("../../firmware/femto_fw.mem", mem);
+		$readmemh (FILE, mem);
 	end
 
 	always @(posedge clk) begin

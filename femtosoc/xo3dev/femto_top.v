@@ -1,4 +1,5 @@
 module femtosoc_top(
+	input wire clk,
 	input wire [3:0] pb,
 	input wire [3:0] sw,
 	inout wire sda, scl, msda, mscl, spi_clk, spi_mosi, spi_miso,
@@ -8,7 +9,7 @@ module femtosoc_top(
 
 parameter integer MEM_WORDS = 8192;
 
-wire clk;
+//wire clk;
 
 wire iomem_valid;
 reg wb_stb;
@@ -71,10 +72,10 @@ end
 
 // Internal Oscillator
 // defparam OSCH_inst.NOM_FREQ = "2.08";// This is the default frequency
-defparam OSCH_inst.NOM_FREQ = "24.18";
-OSCH OSCH_inst( .STDBY(1'b0), // 0=Enabled, 1=Disabled
-.OSC(clk),
-.SEDSTDBY()); // this signal is not required if not using SED
+// defparam OSCH_inst.NOM_FREQ = "24.18";
+// OSCH OSCH_inst( .STDBY(1'b0), // 0=Enabled, 1=Disabled
+// .OSC(clk),
+// .SEDSTDBY()); // this signal is not required if not using SED
 
 
 	femtosoc #(

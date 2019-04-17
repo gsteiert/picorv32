@@ -101,7 +101,7 @@ module efb (wb_clk_i, wb_rst_i, wb_cyc_i, wb_stb_i, wb_we_i, wb_adr_i,
     defparam EFBInst_0.GSR = "ENABLED" ;
     defparam EFBInst_0.TC_CCLK_SEL = 1 ;
     defparam EFBInst_0.TC_MODE = "FASTPWM" ;
-    defparam EFBInst_0.TC_SCLK_SEL = "POSC" ; // "PCLOCK"
+    defparam EFBInst_0.TC_SCLK_SEL = "PCLOCK" ; // "POSC"
     defparam EFBInst_0.EFB_TC_PORTMODE = "WB" ;
     defparam EFBInst_0.EFB_TC = "ENABLED" ;
     defparam EFBInst_0.SPI_WAKEUP = "ENABLED" ;
@@ -130,7 +130,7 @@ module efb (wb_clk_i, wb_rst_i, wb_cyc_i, wb_stb_i, wb_we_i, wb_adr_i,
     defparam EFBInst_0.I2C1_SLAVE_ADDR = "0b1000001" ;
     defparam EFBInst_0.I2C1_ADDRESSING = "7BIT" ;
     defparam EFBInst_0.EFB_I2C1 = "ENABLED" ;
-    defparam EFBInst_0.EFB_WB_CLK_FREQ = "24.0" ;
+    defparam EFBInst_0.EFB_WB_CLK_FREQ = "12.0" ;
     EFB EFBInst_0 (.WBCLKI(wb_clk_i), .WBRSTI(wb_rst_i), .WBCYCI(wb_cyc_i), 
         .WBSTBI(wb_stb_i), .WBWEI(wb_we_i), .WBADRI7(wb_adr_i[7]), .WBADRI6(wb_adr_i[6]), 
         .WBADRI5(wb_adr_i[5]), .WBADRI4(wb_adr_i[4]), .WBADRI3(wb_adr_i[3]), 

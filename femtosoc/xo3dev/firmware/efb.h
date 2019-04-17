@@ -1,3 +1,6 @@
+#ifndef __EFB_H
+#define __EFB_H 1
+
 #include <stdint.h>
 
 #define __I    volatile const
@@ -57,3 +60,5 @@ typedef struct
     __I  uint32_t UNUSED; // 0x76 Reserved Register
     __I  uint32_t EFBIRQ; // 0x77 EFB Interrupt Source
 }  efb_t;
+
+#endif

@@ -24,18 +24,16 @@ void delay_ms(int32_t ms) {
 }
 
 void main() {
-    REG_LEDS = 0x12;
+    REG_LEDS = 0xFB;
     i2c_init(EFB);
-    REG_LEDS = 0x22;
+    delay_ms(100); // allow time for display to power on
+    REG_LEDS = 0xD0;
     disp_init();
-    REG_LEDS = 0x32;
     disp_fill(0x00);
-    REG_LEDS = 0x42;
     disp_whex(0, 7, 0xDEADBEEF);
     disp_whex(0, 5, 0x01234567);
     disp_whex(48, 5, 0x89ABCDEF);
     
-/* */
     delay_ms(1000);
     int32_t i = -1;
     while(1) {

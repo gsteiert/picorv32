@@ -28,7 +28,7 @@ void main() {
     i2c_init(EFB);
     delay_ms(100); // allow time for display to power on
     REG_LEDS = 0xD0;
-    disp_init();
+    disp_init(EFB);
     disp_fill(0x00);
     disp_whex(0, 7, 0xDEADBEEF);
     disp_whex(0, 5, 0x01234567);

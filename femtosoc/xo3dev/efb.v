@@ -12,6 +12,9 @@ module efb (wb_clk_i, wb_rst_i, wb_cyc_i, wb_stb_i, wb_we_i, wb_adr_i,
     wbc_ufm_irq)/* synthesis NGD_DRC_MASK=1 */;
 
     parameter UFM_INIT_START_PAGE = 2038 ;
+    parameter UFM_INIT_FILE_NAME = "NONE";
+    parameter UFM_INIT_PAGES = 8;
+
 
     input wire wb_clk_i;
     input wire wb_rst_i;
@@ -82,10 +85,10 @@ module efb (wb_clk_i, wb_rst_i, wb_cyc_i, wb_stb_i, wb_we_i, wb_adr_i,
     BB BB1_scl (.I(i2c1_sclo), .T(i2c1_scloen), .O(i2c1_scli), .B(i2c1_scl));
 
     defparam EFBInst_0.UFM_INIT_FILE_FORMAT = "HEX" ;
-    defparam EFBInst_0.UFM_INIT_FILE_NAME = "NONE" ;
-    defparam EFBInst_0.UFM_INIT_ALL_ZEROS = "ENABLED" ;
+    defparam EFBInst_0.UFM_INIT_FILE_NAME = UFM_INIT_FILE_NAME ;
+    defparam EFBInst_0.UFM_INIT_ALL_ZEROS = "DISABLED" ;
     defparam EFBInst_0.UFM_INIT_START_PAGE = UFM_INIT_START_PAGE ;
-    defparam EFBInst_0.UFM_INIT_PAGES = 8 ;
+    defparam EFBInst_0.UFM_INIT_PAGES = UFM_INIT_PAGES ;
     defparam EFBInst_0.DEV_DENSITY = "7000L" ;
     defparam EFBInst_0.EFB_UFM = "ENABLED" ;
     defparam EFBInst_0.TC_ICAPTURE = "DISABLED" ;

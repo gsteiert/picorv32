@@ -94,7 +94,9 @@ end
 		.iomem_rdata  (iomem_rdata )
 	);
 
-defparam efb0.UFM_INIT_START_PAGE = 3574;
+defparam efb0.UFM_INIT_START_PAGE = 3456;  // 3584 - pages:  128 pages 3456, 16 pages 3568
+defparam efb0.UFM_INIT_FILE_NAME = "../firmware/hex5x7bmp.mem" ;
+defparam efb0.UFM_INIT_PAGES = 16;
 efb efb0 (
 	.wb_clk_i( clk ), 
 	.wb_rst_i( !resetn ), 

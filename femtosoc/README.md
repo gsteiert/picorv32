@@ -2,8 +2,6 @@
 FemtoSoC - A simpler example SoC using PicoRV32
 =============================================
 
-![](overview.svg)
-
 This is a simpler PicoRV32 example design that can run code directly from 
 pre-loaded RAM. It can be used as a turn-key solution for simple control 
 tasks in ASIC and FPGA designs.
@@ -22,16 +20,29 @@ image for this system.
 | File                              | Description                                                     |
 | --------------------------------- | --------------------------------------------------------------- |
 | [femtosoc.v](femtosoc.v)          | Top-level FemtoSoC Verilog module                               |
-| [start.s](start.s)                | Assembler source for firmware.hex/firmware.bin                  |
-| [sections.lds](sections.lds)      | Linker script for firmware.hex/firmware.bin                     |
+| [femto.s](femto.s)                | Startup assembler source for firmware.hex/firmware.bin          |
+| [femto.lds](femto.lds)            | Linker script for firmware.hex/firmware.bin                     |
 
 ### Memory map:
 
 | Address Range            | Description                             |
 | ------------------------ | --------------------------------------- |
 | 0x00000000 .. 0x00FFFFFF | Internal SRAM                           |
-| 0x01000000 .. 0xFFFFFFFF | Memory mapped user peripherals          |
+| 0x01000000 .. 0x01FFFFFF | Memory mapped user peripherals          |
+| 0x04000000 .. 0x04FFFFFF | Wishbone peripherals (EFB)              |
 
-The example design (femto_top.v) has the 8 LEDs on the MachXO2 Breakout Board
-mapped to the low byte of the 32 bit word at address 0x01000000.
+### Examples
+There are three example designs xo2breakout, xo3starter and xo3dev. 
+xo2breakout and xo3starter implement 16KB of RAM, and the xo3dev implents 32KB of RAM.  
+RAM is shared for code and data, and the code is preloaded as part of the flash image.
+
+### Interfaces
+* LEDs:  {GPO[7:1], Timer Output}
+* I2C:  SCL, SDA
+* SPI:  SCK, MOSI, MISO, CSN[7:0]
+* CLK:  (only available on xo3starter & xo3dev)
+* SW:  SW[3:0] = GPI[3:0] (only available on xo3starter & xo3dev)
+* PB:  PB[3:0] = GPI[7:4] (only available on xo3dev) 
+* Timer:  Timer in = PB[2], Timer out = LED[0]
+* SPI Flash: 1MB on xo3starter, 2MB on xo3dev (not available on xo2breakout) 
 

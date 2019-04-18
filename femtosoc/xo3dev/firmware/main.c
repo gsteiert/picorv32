@@ -25,12 +25,12 @@ void delay_ms(int32_t ms) {
 
 void main() {
     REG_LEDS = 0x12;
-    REG_LEDS = i2c_init(EFB);
-    delay_ms(10);
-    REG_LEDS = disp_init();
-    delay_ms(10);
-    REG_LEDS = disp_fill(0x00);
-    delay_ms(1000);
+    i2c_init(EFB);
+    REG_LEDS = 0x22;
+    disp_init();
+    REG_LEDS = 0x32;
+    disp_fill(0x00);
+    REG_LEDS = 0x42;
     disp_whex(0, 7, 0xDEADBEEF);
     disp_whex(0, 5, 0x01234567);
     disp_whex(48, 5, 0x89ABCDEF);
@@ -39,7 +39,7 @@ void main() {
     delay_ms(1000);
     int32_t i = -1;
     while(1) {
-        i -= 1;
+        i += 1;
         REG_LEDS = i >> 8;
         EFB->TCOCRSET[0] = i; 
         if ((i & 0xFF)==0) {

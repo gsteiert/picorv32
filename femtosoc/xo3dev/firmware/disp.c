@@ -2,19 +2,14 @@
 #include <stdint.h>
 #include "efb.h"
 #include "i2c.h"
+#include "ufm.h"
 #include "disp.h"
 
-volatile efb_t *disp_efb;
+static uint8_t disp_font_buf[16];
+static int32_t disp_font_page;
 
-int32_t disp_init(efb_t *efb) {
-    disp_efb = efb;
-    disp_efb->CFGCR = 0x80;  // open frame
-    disp_efb->CFGTXDR = 0x74;
-    disp_efb->CFGTXDR = 0x08;
-    disp_efb->CFGTXDR = 0x00;
-    disp_efb->CFGTXDR = 0x00;
-    disp_efb->CFGCR = 0x00;  // close frame
-
+int32_t disp_init() {
+    disp_font_page = -1;
     i2c_wbyte(I2C_START, DISP_I2C_ADDR);
     i2c_wbyte(I2C_WRITE, DISP_COMMAND); 
     i2c_wbyte(I2C_WRITE, 0xAE);  // Display Off
@@ -82,31 +77,22 @@ int32_t disp_whex(uint32_t x, uint32_t y, uint32_t data){
     i2c_wbyte(I2C_WRITE, DISP_COMMAND); 
     i2c_wbyte(I2C_WRITE, (x&0x0F));  // Column x low nibble
     i2c_stop();
-    static int32_t h, i, j;
+    int32_t nib, need_page, start_index, i, j;
     for (i = 7; i >= 0 ; i--) {
-        h = ((data >> (i << 2))&0x0F)+DISP_1ST_PAGE;
-        disp_efb->CFGCR = 0x80;  // open frame
-        disp_efb->CFGTXDR = 0xB4; // Set UFM Address
-        disp_efb->CFGTXDR = 0x00;
-        disp_efb->CFGTXDR = 0x00;
-        disp_efb->CFGTXDR = 0x00;
-        disp_efb->CFGTXDR = 0x40; // UFM Address
-        disp_efb->CFGTXDR = 0x00;
-        disp_efb->CFGTXDR = (h >> 8); // 
-        disp_efb->CFGTXDR = h;   // wishbone implementation ignores higher bits
-        disp_efb->CFGCR = 0x00;  // close frame
-        disp_efb->CFGCR = 0x80;  // open frame
-        disp_efb->CFGTXDR = 0xCA; // Read UFM
-        disp_efb->CFGTXDR = 0x10;
-        disp_efb->CFGTXDR = 0x00;
-        disp_efb->CFGTXDR = 0x01; // 1 page
-        for (j= 0; j < 5; j++){
+        nib = ((data >> (i << 2))&0x0F);
+        start_index = ((nib & 1)<<3);  // odd bytes start at the 8th byte in the page
+        need_page = (nib>>1)+DISP_1ST_PAGE; // two characters per page
+        // check to see if the buffer has the data you need before reading UFM
+        if (disp_font_page != need_page) {  
+            ufm_read_page(need_page, disp_font_buf);
+            disp_font_page = need_page;
+        }
+        for (j= start_index; j < (start_index+5); j++){
             i2c_wbyte(I2C_START, DISP_I2C_ADDR);
             i2c_wbyte(I2C_WRITE, DISP_DATA); 
-            i2c_wbyte(I2C_WRITE, (disp_efb->CFGRXDR));  // hex digit data
+            i2c_wbyte(I2C_WRITE, (disp_font_buf[j]));  // font data from buffer
             i2c_stop();
         }
-        disp_efb->CFGCR = 0x00;  // close frame
         i2c_wbyte(I2C_START, DISP_I2C_ADDR);
         i2c_wbyte(I2C_WRITE, DISP_DATA); 
         i2c_wbyte(I2C_WRITE, 0x00);  

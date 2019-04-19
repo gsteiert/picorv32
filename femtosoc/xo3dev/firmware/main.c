@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include "efb.h"
 #include "i2c.h"
+#include "ufm.h"
 #include "disp.h"
 
 #define WB_BASE   0x04000000
@@ -26,9 +27,10 @@ void delay_ms(int32_t ms) {
 void main() {
     REG_LEDS = 0xFB;
     i2c_init(EFB);
+    ufm_init(EFB);
     delay_ms(100); // allow time for display to power on
     REG_LEDS = 0xD0;
-    disp_init(EFB);
+    disp_init();
     disp_fill(0x00);
     disp_whex(0, 7, 0xDEADBEEF);
     disp_whex(0, 5, 0x01234567);
